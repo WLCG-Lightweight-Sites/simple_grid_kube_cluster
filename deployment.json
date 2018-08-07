@@ -1,0 +1,32 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: lightweight-site-wn-test-deployment
+  "labels": {
+    "name": "lightweight-site-wn-test"
+}
+spec:
+  revisionHistoryLimit: 1
+  replicas: 1
+  template:
+    metadata:
+      name: lightweight-site-wn-test2
+      labels:
+        team: platform
+        tier: search
+        app: lightweight-site-wn-test2
+    spec:
+      containers:
+      - name: lightweight-site-wn-test
+        image: maany/lightweight-site-wn-umd4
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/bash", "-c", "sleep infinity"]
+        ports:
+          - containerPort: 6443
+        volumeMounts:
+        - mountPath: "/wn-config"
+          name: wn-config
+      volumes:
+      - name: wn-config
+        emptyDir: {}
+
