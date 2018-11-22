@@ -1,0 +1,24 @@
+- hosts: master
+  become: yes
+  tasks:
+    - name: deployment creation
+      become: yes
+      become_user: centos
+      shell: kubectl create -f /home/centos/wlcg_lightweight_site_wn_pbs/deployment.json
+
+    - name: get-po
+      become_user: centos
+      shell: kubectl get po | awk -F ' ' '{print $1}' | sed -n 2p
+      register: popo
+    - debug: 
+       msg: "{{ popo.stdout }}"
+
+    - name: copy
+      become: yes
+      become_user: centos
+      shell: kubectl cp /home/centos/wlcg_lightweight_site_wn_pbs/yaim/wn-config/ "{{ popo.stdout }}":/
+ 
+    - name: run init.sh
+      become: yes
+      become_user: centos
+      shell: kubectl exec -it "{{ popo.stdout }}" -- /bin/bash -c /wn-config/init.sh
